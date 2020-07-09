@@ -1,9 +1,9 @@
+import sys
 import textwrap
 from room import Room
 from player import Player
 
 # Declare all the rooms
-# a dictionary of rooms created from the Room class
 room = {
     'outside': Room("Outside Cave Entrance", """North of you, the cave mount beckons."""),
 
@@ -26,14 +26,17 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
-#
-# Main
-#
+# MAIN -----------------------------------------------------------------------------------------
+playing = False
+
+game_start = input('Would you like to start the adventure game? [y] [n]\n').lower()
+if game_start == 'y':
+    playing = True
+else:
+    print('Maybe next time then!')
+    sys.exit()
 
 # Make a new player object that is currently in the 'outside' room.
-name = input('Greetings adventurer! What is your name? ')
-player = Player(name, room['outside'].name)
-
 # Write a loop that:
 # * Prints the current room name
 # * Prints the current description (the textwrap module might be useful here).
@@ -43,92 +46,51 @@ player = Player(name, room['outside'].name)
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
-while True:
-    print(f'~ {player.current_room} ~')
+name = input('Greetings adventurer! What is your name? ')
+player = Player(name, room['outside'])
+print('-\n(Press [q] at anytime to quit the game)\n-\n')
+print('You are currently at the ' + player.current_room.name + '.')
 
-    if player.current_room == room['outside'].name:
-        print(room['outside'].description)
-        choice = input(f'-\n{player.name}, Would you like to enter the cave? [y] [n] \nTo quit [q]\n')
-        if choice == 'y':
-            player.current_room = room['outside'].n_to.name
-            print('-\nYou head into the ' + player.current_room + '.')
-        elif choice == 'q':
-            print(f'Thank you for playing, {player.name}!')
-            break
-        else:
-            print('You made it all the way here! Oh well, maybe next time.')
-            break
-    elif player.current_room == room['foyer'].name:
-        print(room['foyer'].description)
-        choice = input('-\nWhich direction wold you like to move in? [n] [s] [e] [w] \nTo quit [q]\n')
-        if choice == 'n':
-            player.current_room = room['foyer'].n_to.name
-            print('-\nYou moved into ' + player.current_room + '.')
-        elif choice == 's':
-            player.current_room = room['foyer'].s_to.name
-            print('-\nYou head back ' + player.current_room + '.')
-        elif choice == 'w':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'e':
-            player.current_room = room['foyer'].e_to.name
-            print('-\nYou squeeze into the ' + player.current_room + '.')
-        elif choice == 'q':
-            print(f'Thank you for playing, {player.name}!')
-            break
-        else:
-            print('Which way would you like to go?')
-    elif player.current_room == room['overlook'].name:
-        print(room['overlook'].description)
-        choice = input('-\nWhich direction wold you like to move in? [n] [s] [e] [w] \nTo quit [q]\n')
-        if choice == 'n':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 's':
-            player.current_room = room['overlook'].s_to.name
-            print('-\nYou head back ' + player.current_room + '.')
-        elif choice == 'e':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'w':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'q':
-            print(f'Thank you for playing, {player.name}!')
-            break
-        else:
-            print('Which way would you like to go?')
-    elif player.current_room == room['narrow'].name:
-        print(room['narrow'].description)
-        choice = input('-\nWhich direction wold you like to move in? [n] [s] [e] [w] \nTo quit [q]\n')
-        if choice == 'n':
-            player.current_room = room['narrow'].n_to.name
-            print('-\nYou find yourself inside the ' + player.current_room + '.')
-        elif choice == 's':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'e':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'w':
-            player.current_room = room['narrow'].w_to.name
-            print('You head back into the ' + player.current_room + '.')
-        elif choice == 'q':
-            print(f'Thank you for playing, {player.name}!')
-            break
-        else:
-            print('Which way would you like to go?')
-    elif player.current_room == room['treasure'].name:
-        print(room['treasure'].description)
-        choice = input('-\nYou were too slow! Head back the way you came. [s] \nTo quit [q]\n')
-        if choice == 'n':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 's':
-            player.current_room = room['treasure'].s_to.name
-            print('You leave the Treasure Chamber and head back into the ' + player.current_room + '.')
-        elif choice == 'e':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'w':
-            print('-\nThere is no entrance on this side.')
-        elif choice == 'q':
-            print(f'Thank you for playing, {player.name}!')
-            break
-        else:
-            print('Which way would you like to go?')
+while playing == True:
+    choice = input('Which way would you like to go? [n] [s] [e] [w]\n').lower()
+
+    if choice == 'q':
+        sys.exit()
     else:
-        print('It seems you are located somewhere that should not exist.')
-        break
+        next_room = getattr(player.current_room, f'{choice}_to', None)
+        if next_room == None:
+            print('There is no path this way. Try a different direction.')
+        else:
+            player.current_room = next_room
+            print(f'---\nYou are at the {player.current_room.name}')
+
+# OLD ATTEMPT ----------------------------------------------------------------------------------
+    # if choice == 'q':
+    #     playing = False
+    #     print(f'Thanks for playing, {player.name}!')
+    # elif choice == 'n':
+    #     if hasattr(player.current_room, 'n_to'):
+    #         player.current_room = player.current_room.n_to
+    #         print('\n---\n~ You enter the ' + player.current_room.name + ' ~\n---\n')
+    #     else:
+    #         print('[X] There is no path this way.')
+    # elif choice == 's':
+    #     if hasattr(player.current_room, 's_to'):
+    #         player.current_room = player.current_room.s_to
+    #         print('\n---\n~ You enter the ' + player.current_room.name + ' ~\n---\n')
+    #     else:
+    #         print('[X] There is no way to get through.')
+    # elif choice == 'e':
+    #     if hasattr(player.current_room, 'e_to'):
+    #         player.current_room = player.current_room.e_to
+    #         print('\n---\n~ You enter the ' + player.current_room.name + ' ~\n---\n')
+    #     else:
+    #         print('[X] There is no door this way.')
+    # elif choice == 'w':
+    #     if hasattr(player.current_room, 'w_to'):
+    #         player.current_room = player.current_room.w_to
+    #         print('\n---\n~ You enter the ' + player.current_room.name + ' ~\n---\n')
+    #     else:
+    #         print('[X] This is a dead end.')
+    # else:
+    #     print('Please enter a valid direction: [n] [s] [e] [w]\nOr press [q] to quit\n')
