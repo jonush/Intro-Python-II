@@ -2,6 +2,7 @@ import sys
 import textwrap
 from room import Room
 from player import Player
+from item import Item
 
 # Declare all the rooms
 room = {
@@ -27,15 +28,6 @@ room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
 # MAIN -----------------------------------------------------------------------------------------
-playing = False
-
-game_start = input('Would you like to start the adventure game? [y] [n]\n').lower()
-if game_start == 'y':
-    playing = True
-else:
-    print('Maybe next time then!')
-    sys.exit()
-
 # Make a new player object that is currently in the 'outside' room.
 # Write a loop that:
 # * Prints the current room name
@@ -46,23 +38,71 @@ else:
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+
+playing = False
+
+game_start = input('Would you like to start the adventure game? [y] [n]\n').lower()
+if game_start == 'y':
+    playing = True
+else:
+    print('Maybe next time then!')
+    sys.exit()
+
 name = input('Greetings adventurer! What is your name? ')
 player = Player(name, room['outside'])
 print('-\n(Press [q] at anytime to quit the game)\n-\n')
 print('You are currently at the ' + player.current_room.name + '.')
 
-while playing == True:
-    choice = input('Which way would you like to go? [n] [s] [e] [w]\n').lower()
+sword = Item('sword', 'a shiny sword')
+shield = Item('shield', 'a sturdy shield')
+spear = Item('spear', 'a pointy spear')
+chest = Item('chest', 'an empty chest')
 
-    if choice == 'q':
+room['foyer'].items.append(spear)
+room['overlook'].items.append(sword)
+room['overlook'].items.append(shield)
+room['treasure'].items.append(chest)
+
+def get_player_inv():
+    for i in player.items:
+        print(f'•{i.name}: {i.description}')
+        return
+
+def get_room_inv(r_items):
+    if not r_items:
+        print('> There are no items in this room.')
+        return
+    elif len(r_items) < 2:
+        print('You found an item in this room!')
+        print(f'•{r_items[0].name}')
+    else:
+        print('You found items in this room!')
+        for i in r_items:
+            print(f'•{i.name}')
+
+def take_item(item):
+    print('You picked up this item.')
+
+while playing == True:
+    action = input('Which way would you like to go? [n] [s] [e] [w]\nInteract with items using: [get] [item], [take] [item], or [drop] [item]\nCheck your inventory using: [inventory] or [i]\n').lower()
+
+    if action == 'q':
         sys.exit()
     else:
-        next_room = getattr(player.current_room, f'{choice}_to', None)
+        next_room = getattr(player.current_room, f'{action}_to', None)
         if next_room == None:
-            print('There is no path this way. Try a different direction.')
+            print('\n---\nThere is no path this way. Try a different direction.\n')
         else:
             player.current_room = next_room
-            print(f'---\nYou are at the {player.current_room.name}')
+            print(f'\n---\nYou arrive at the {player.current_room.name}')
+            get_room_inv(player.current_room.items)
+            print('---\n')
+
+## get player inventory       
+    # if action == 'i' or 'inventory':
+    #     print('\n---\nYour inventory:')
+    #     get_player_inv()
+    #     print('---\n')
 
 # OLD ATTEMPT ----------------------------------------------------------------------------------
     # if choice == 'q':
