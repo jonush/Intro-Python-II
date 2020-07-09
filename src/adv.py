@@ -63,11 +63,6 @@ room['overlook'].items.append(sword)
 room['overlook'].items.append(shield)
 room['treasure'].items.append(chest)
 
-def get_player_inv():
-    for i in player.items:
-        print(f'•{i.name}: {i.description}')
-        return
-
 def get_room_inv(r_items):
     if not r_items:
         print('> There are no items in this room.')
@@ -80,10 +75,7 @@ def get_room_inv(r_items):
         for i in r_items:
             print(f'•{i.name}')
 
-def take_item(item):
-    print('You picked up this item.')
-
-while playing == True:
+while playing:
     action = input('Which way would you like to go? [n] [s] [e] [w]\nInteract with items using: [get] [item], [take] [item], or [drop] [item]\nCheck your inventory using: [inventory] or [i]\n').lower()
 
     if action == 'q':
@@ -97,12 +89,6 @@ while playing == True:
             print(f'\n---\nYou arrive at the {player.current_room.name}')
             get_room_inv(player.current_room.items)
             print('---\n')
-
-## get player inventory       
-    # if action == 'i' or 'inventory':
-    #     print('\n---\nYour inventory:')
-    #     get_player_inv()
-    #     print('---\n')
 
 # OLD ATTEMPT ----------------------------------------------------------------------------------
     # if choice == 'q':
