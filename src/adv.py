@@ -77,7 +77,7 @@ while playing == True:
             item = [i for i in player.current_room.items if i.name == action.split(' ')[1]]
             player.take_item(item[0])
         else:
-            item = [i for i in player.current_room.items if i.name == action.split(' ')[1]]
+            item = [i for i in player.items if i.name == action.split(' ')[1]]
             player.drop_item(item[0])
     elif action in {'i', 'inventory'}:
         player.list_inventory()

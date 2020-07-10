@@ -40,5 +40,5 @@ class Player:
     def drop_item(self, item):
         self.items.remove(item)
         self.current_room.items.append(item)
-        action_item = [i for i in self.items if i.name == item.name]
+        action_item = [i for i in self.current_room.items if i.name == item.name]
         action_item[0].on_drop(action_item[0])
