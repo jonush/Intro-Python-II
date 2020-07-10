@@ -27,7 +27,7 @@ room['narrow'].w_to = room['foyer']
 room['narrow'].n_to = room['treasure']
 room['treasure'].s_to = room['narrow']
 
-# MAIN -----------------------------------------------------------------------------------------
+# MAIN ------------------------------------------------------------------------
 # Make a new player object that is currently in the 'outside' room.
 # Write a loop that:
 # * Prints the current room name
@@ -51,46 +51,40 @@ else:
 name = input('Greetings adventurer! What is your name? ')
 player = Player(name, room['outside'])
 print('-\n(Press [q] at anytime to quit the game)\n-\n')
-print('You are currently at the ' + player.current_room.name + '.')
+print(f'{player}\n')
 
 sword = Item('sword', 'a shiny sword')
 shield = Item('shield', 'a sturdy shield')
 spear = Item('spear', 'a pointy spear')
 chest = Item('chest', 'an empty chest')
 
-room['foyer'].items.append(spear)
-room['overlook'].items.append(sword)
-room['overlook'].items.append(shield)
-room['treasure'].items.append(chest)
+room['foyer'].add_item(spear)
+room['overlook'].add_item(sword)
+room['overlook'].add_item(shield)
+room['treasure'].add_item(chest)
 
-def get_room_inv(r_items):
-    if not r_items:
-        print('> There are no items in this room.')
-        return
-    elif len(r_items) < 2:
-        print('You found an item in this room!')
-        print(f'•{r_items[0].name}')
-    else:
-        print('You found items in this room!')
-        for i in r_items:
-            print(f'•{i.name}')
-
-while playing:
-    action = input('Which way would you like to go? [n] [s] [e] [w]\nInteract with items using: [get] [item], [take] [item], or [drop] [item]\nCheck your inventory using: [inventory] or [i]\n').lower()
+while playing == True:
+    action = input('---\nWhich way would you like to go? [n] [s] [e] [w]\nEnter [i] or [inventory] to view your items\n---\n').lower()
 
     if action == 'q':
+        print(f'Bye {player.name}!')
         sys.exit()
-    else:
-        next_room = getattr(player.current_room, f'{action}_to', None)
-        if next_room == None:
-            print('\n---\nThere is no path this way. Try a different direction.\n')
+    elif action in {'n', 's', 'e', 'w'}:
+        player.move(action)
+        player.explore()
+    elif len(action) > 1:
+        if action.split(' ')[0] in {'get', 'take'}:
+            item = [i for i in player.current_room.items if i.name == action.split(' ')[1]]
+            player.take_item(item[0])
         else:
-            player.current_room = next_room
-            print(f'\n---\nYou arrive at the {player.current_room.name}')
-            get_room_inv(player.current_room.items)
-            print('---\n')
-
-# OLD ATTEMPT ----------------------------------------------------------------------------------
+            item = [i for i in player.current_room.items if i.name == action.split(' ')[1]]
+            player.drop_item(item[0])
+    elif action in {'i', 'inventory'}:
+        player.list_inventory()
+    else:
+        continue
+            
+# OLD ATTEMPT -------------------------------------------------------------------------
     # if choice == 'q':
     #     playing = False
     #     print(f'Thanks for playing, {player.name}!')
